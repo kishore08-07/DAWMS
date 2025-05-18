@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Asset QR Code</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Asset QR Code</h2>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${asset.name}"></h5>
+                <p class="card-text">Serial Number: <span th:text="${asset.serialNumber}"></span></p>
+                <p class="card-text">Category: <span th:text="${asset.category}"></span></p>
+                
+                <div class="text-center">
+                    <img th:src="${asset.qrCodePath}" alt="Asset QR Code" class="img-fluid">
+                </div>
+                
+                <div class="text-center mt-3">
+                    <a href="#" onclick="window.print()" class="btn btn-primary">Print QR Code</a>
+                    <a th:href="@{/assets/register}" class="btn btn-secondary">Register Another Asset</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

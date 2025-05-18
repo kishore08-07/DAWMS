@@ -5,6 +5,7 @@ import com.backend.dawms.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -59,8 +60,30 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Auth endpoints - no authentication required
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/signup").permitAll()
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/verify-otp").permitAll()
+                .requestMatchers("/api/auth/refresh-token").permitAll()
                 .requestMatchers("/api/test/**").permitAll()
+                // Swagger/OpenAPI endpoints
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // Warranty endpoints
+                .requestMatchers(HttpMethod.GET, "/api/warranties/**").hasAnyRole("EMPLOYEE", "ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.POST, "/api/warranties/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/warranties/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.DELETE, "/api/warranties/**").hasRole("ADMIN")
+                // Asset endpoints
+                .requestMatchers(HttpMethod.GET, "/api/assets/**").hasAnyRole("EMPLOYEE", "ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.POST, "/api/assets/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/assets/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.DELETE, "/api/assets/**").hasRole("ADMIN")
+                // Maintenance endpoints
+                .requestMatchers(HttpMethod.GET, "/api/maintenance/**").hasAnyRole("EMPLOYEE", "ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.POST, "/api/maintenance/**").hasAnyRole("EMPLOYEE", "ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.PUT, "/api/maintenance/**").hasAnyRole("ADMIN", "TECHNICIAN")
+                .requestMatchers(HttpMethod.DELETE, "/api/maintenance/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             );
         
@@ -73,10 +96,25 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // Frontend URL
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-        configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "Accept",
+            "Origin",
+            "X-Requested-With",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials"
+        ));
+        configuration.setAllowCredentials(true);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

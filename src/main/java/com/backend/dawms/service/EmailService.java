@@ -38,4 +38,17 @@ public class EmailService {
         
         mailSender.send(mimeMessage);
     }
+
+    @Async
+    public void sendHtmlEmail(String to, String subject, String htmlContent) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+        
+        helper.setText(htmlContent, true);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setFrom("noreply@dawms.com");
+        
+        mailSender.send(mimeMessage);
+    }
 } 

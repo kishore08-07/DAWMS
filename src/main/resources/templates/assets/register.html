@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Asset Registration</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Register New Asset</h2>
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <form th:action="@{/assets/register}" th:object="${assetDTO}" method="post">
+            <div class="form-group">
+                <label>Asset Name</label>
+                <input type="text" class="form-control" th:field="*{name}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Serial Number</label>
+                <input type="text" class="form-control" th:field="*{serialNumber}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select class="form-control" th:field="*{category}" required>
+                    <option value="ELECTRONICS">Electronics</option>
+                    <option value="MACHINERY">Machinery</option>
+                    <option value="VEHICLES">Vehicles</option>
+                    <option value="FURNITURE">Furniture</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Department</label>
+                <select class="form-control" th:field="*{departmentId}">
+                    <option value="">-- Select Department --</option>
+                    <option th:each="dept : ${departments}"
+                            th:value="${dept.id}"
+                            th:text="${dept.name}"></option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Assign to Employee</label>
+                <select class="form-control" th:field="*{employeeId}">
+                    <option value="">-- Select Employee --</option>
+                    <option th:each="emp : ${employees}"
+                            th:value="${emp.id}"
+                            th:text="${emp.name}"></option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Register Asset</button>
+        </form>
+    </div>
+</body>
+</html> 

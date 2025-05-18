@@ -22,11 +22,15 @@ public class OtpVerification {
     
     private String otpCode;
     
-    private LocalDateTime createdAt;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+    
+    private LocalDateTime verifiedAt;
     
     private LocalDateTime expiresAt;
     
-    private LocalDateTime verifiedAt;
+    @Builder.Default
+    private boolean used = false;
     
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(this.expiresAt);

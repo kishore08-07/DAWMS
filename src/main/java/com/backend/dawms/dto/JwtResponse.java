@@ -14,7 +14,10 @@ import java.util.List;
 public class JwtResponse {
     private String token;
     private String refreshToken;
+    
+    @Builder.Default
     private String type = "Bearer";
+    
     private int id;
     private String email;
     private boolean verified;

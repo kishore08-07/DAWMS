@@ -90,13 +90,18 @@ public class AuthService {
     
     @Transactional
     public JwtResponse login(LoginRequest loginRequest) {
+        //Authenticates the user using Spring Security.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        
+
+        //Stores the authentication info in the security context.
+        //Spring Security’s way of storing who is logged in
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        
+
+        //Gets the authenticated user's details.
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        
+
+        //Ensures the account is verified before logging in.
         if (!userDetails.isEnabled()) {
             throw new RuntimeException("Account is not verified. Please verify your email first.");
         }

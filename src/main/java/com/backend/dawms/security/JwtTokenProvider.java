@@ -44,10 +44,13 @@ public class JwtTokenProvider {
         String authorities = userPrincipal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
+
+        log.debug("Generating token for user: {} with authorities: {}", userPrincipal.getUsername(), authorities);
         
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .claim("roles", authorities)
+                .claim("userId", userPrincipal.getId())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key(), SignatureAlgorithm.HS256)
@@ -93,6 +96,18 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token);
+            
+            // Add debug logging for token validation
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            
+            log.debug("Token validated. Subject: {}, Roles: {}", 
+                    claims.getSubject(), 
+                    claims.get("roles", String.class));
+            
             return true;
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
